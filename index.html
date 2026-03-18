@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Conteúdo Instagram</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --accent: #c8a96e;
+    --accent2: #e8c88e;
+    --text: #f0ece4;
+    --muted: #888;
+    --danger: #e06060;
+    --green: #6ec8a0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+  }
+  header .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+  header .sub {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  header .dot { color: var(--border); }
+
+  .app {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    min-height: calc(100vh - 65px);
+  }
+
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow-y: auto;
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .format-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .format-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .format-btn .icon { font-size: 18px; }
+  .format-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .format-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0d0d0d;
+    font-weight: 600;
+  }
+
+  .hook-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .hook-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--muted);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hook-item .badge {
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: var(--border);
+    color: var(--muted);
+    white-space: nowrap;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .hook-item:hover { border-color: var(--accent); color: var(--text); }
+  .hook-item.active {
+    border-color: var(--accent);
+    color: var(--text);
+    background: rgba(200,169,110,0.08);
+  }
+  .hook-item.active .badge {
+    background: var(--accent);
+    color: #0d0d0d;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 120px;
+    outline: none;
+    transition: border 0.2s;
+  }
+  textarea::placeholder { color: var(--muted); }
+  textarea:focus { border-color: var(--accent); }
+
+  input[type="text"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border 0.2s;
+  }
+  input[type="text"]::placeholder { color: var(--muted); }
+  input[type="text"]:focus { border-color: var(--accent); }
+
+  .generate-btn {
+    background: var(--accent);
+    color: #0d0d0d;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .generate-btn:hover { background: var(--accent2); transform: translateY(-1px); }
+  .generate-btn:active { transform: translateY(0); }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .main {
+    padding: 32px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .output-placeholder {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: var(--muted);
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .output-placeholder .big-icon { font-size: 48px; opacity: 0.3; }
+  .output-placeholder p { font-size: 14px; max-width: 320px; line-height: 1.6; }
+
+  .output-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .output-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .output-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .output-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .tag {
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(200,169,110,0.12);
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .copy-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+  .content-body {
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.9;
+    color: #d4cfc7;
+  }
+
+  .roteiro-section { margin-bottom: 20px; }
+  .roteiro-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .roteiro-text {
+    background: var(--surface2);
+    border-left: 2px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+  .roteiro-text.hook { border-color: #e06060; font-size: 15px; font-weight: 500; }
+  .roteiro-text.cta { border-color: var(--green); }
+
+  .slides-preview { display: flex; flex-direction: column; gap: 12px; }
+  .slide-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .slide-num {
+    min-width: 28px;
+    height: 28px;
+    background: var(--accent);
+    color: #0d0d0d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .slide-content { flex: 1; }
+  .slide-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .slide-body { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 14px;
+    padding: 40px;
+    justify-content: center;
+  }
+  .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-msg {
+    background: rgba(224,96,96,0.1);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .tip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tip-pill {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .tip-pill:hover { border-color: var(--accent); color: var(--accent); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">CONTEÚDO IG</div>
+  </div>
+  <span class="dot">|</span>
+  <div class="sub">Gerador de Roteiros & Cards</div>
+</header>
+
+<div class="app">
+  <aside class="sidebar">
+
+    <div>
+      <div class="section-label">Seu nicho / profissão</div>
+      <input type="text" id="niche" placeholder="Ex: nutricionista, corretor, personal..." />
+    </div>
+
+    <div>
+      <div class="section-label">Formato do conteúdo</div>
+      <div class="format-grid" id="formatGrid">
+        <button class="format-btn active" data-format="reels" onclick="selectFormat(this)">
+          <span class="icon">🎬</span> Reels / Vídeo
+        </button>
+        <button class="format-btn" data-format="carrossel" onclick="selectFormat(this)">
+          <span class="icon">🃏</span> Carrossel
+        </button>
+        <button class="format-btn" data-format="single" onclick="selectFormat(this)">
+          <span class="icon">🖼️</span> Card único
+        </button>
+        <button class="format-btn" data-format="legenda" onclick="selectFormat(this)">
+          <span class="icon">✍️</span> Só legenda
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Tipo de gancho</div>
+      <div class="hook-list">
+        <div class="hook-item active" data-hook="storytelling" onclick="selectHook(this)">
+          <span>Storytelling</span><span class="badge">O momento que...</span>
+        </div>
+        <div class="hook-item" data-hook="quebra" onclick="selectHook(this)">
+          <span>Quebra de padrão</span><span class="badge">Você está errado</span>
+        </div>
+        <div class="hook-item" data-hook="promessa" onclick="selectHook(this)">
+          <span>Promessa</span><span class="badge">Como faturar...</span>
+        </div>
+        <div class="hook-item" data-hook="curiosidade" onclick="selectHook(this)">
+          <span>Curiosidade & Dor</span><span class="badge">Olha o que aconteceu</span>
+        </div>
+        <div class="hook-item" data-hook="autoridade" onclick="selectHook(this)">
+          <span>Autoridade</span><span class="badge">Depois de X clientes</span>
+        </div>
+        <div class="hook-item" data-hook="bastidores" onclick="selectHook(this)">
+          <span>Bastidores</span><span class="badge">O que ninguém vê</span>
+        </div>
+        <div class="hook-item" data-hook="tempo" onclick="selectHook(this)">
+          <span>Arrependimento</span><span class="badge">Se eu voltasse...</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Objetivo do conteúdo</div>
+      <div class="format-grid" id="objGrid">
+        <button class="format-btn active" data-obj="atracao" onclick="selectObj(this)">
+          <span class="icon">🧲</span> Atração
+        </button>
+        <button class="format-btn" data-obj="qualificacao" onclick="selectObj(this)">
+          <span class="icon">🎯</span> Qualificação
+        </button>
+        <button class="format-btn" data-obj="conversao" onclick="selectObj(this)">
+          <span class="icon">💰</span> Conversão
+        </button>
+        <button class="format-btn" data-obj="autoridade" onclick="selectObj(this)">
+          <span class="icon">🏆</span> Autoridade
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Sua ideia / briefing</div>
+      <textarea id="brief" placeholder="Descreva sua ideia aqui..."></textarea>
+      <div style="height:8px"></div>
+      <div class="tip-row" id="tipRow"></div>
+    </div>
+
+    <button class="generate-btn" id="genBtn" onclick="generate()">
+      ✦ Gerar Conteúdo
+    </button>
+
+  </aside>
+
+  <main class="main" id="main">
+    <div class="output-placeholder" id="placeholder">
+      <div class="big-icon">✦</div>
+      <p>Preencha o briefing ao lado e clique em <strong>Gerar Conteúdo</strong>.<br>O roteiro ou copy aparece aqui, pronto para usar.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+let selectedFormat = 'reels';
+let selectedHook = 'storytelling';
+let selectedObj = 'atracao';
+
+const tips = {
+  reels: ['Fale de um erro seu', 'Mostre antes e depois', 'Revele um bastidor', 'Dê uma virada inesperada'],
+  carrossel: ['5 dicas sobre [tema]', 'O que ninguém conta sobre...', 'Comparativo certo x errado', 'Passo a passo visual'],
+  single: ['Frase impactante + contexto', 'Stat + insight', 'Provocação + resposta'],
+  legenda: ['Mini história com CTA', 'Opinião polêmica', 'Pergunta que gera debate'],
+};
+
+function selectFormat(el) {
+  document.querySelectorAll('#formatGrid .format-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedFormat = el.dataset.format;
+  updateTips();
+}
+function selectObj(el) {
+  document.querySelectorAll('#objGrid .format-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedObj = el.dataset.obj;
+}
+function selectHook(el) {
+  document.querySelectorAll('.hook-item').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedHook = el.dataset.hook;
+}
+function updateTips() {
+  const row = document.getElementById('tipRow');
+  row.innerHTML = (tips[selectedFormat]||[]).map(t =>
+    `<span class="tip-pill" onclick="appendTip('${t}')">${t}</span>`
+  ).join('');
+}
+function appendTip(txt) {
+  const ta = document.getElementById('brief');
+  ta.value = ta.value ? ta.value + ' ' + txt : txt;
+  ta.focus();
+}
+updateTips();
+
+const hookLabels = { storytelling:'Storytelling', quebra:'Quebra de Padrão', promessa:'Promessa', curiosidade:'Curiosidade & Dor', autoridade:'Autoridade', bastidores:'Bastidores', tempo:'Arrependimento' };
+const formatLabels = { reels:'Roteiro de Reels', carrossel:'Carrossel', single:'Card Único', legenda:'Legenda' };
+const objLabels = { atracao:'Atração', qualificacao:'Qualificação', conversao:'Conversão', autoridade:'Autoridade' };
+
+async function generate() {
+  const brief = document.getElementById('brief').value.trim();
+  const niche = document.getElementById('niche').value.trim();
+  if (!brief) { alert('Preencha o briefing com sua ideia!'); return; }
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Gerando...';
+
+  const main = document.getElementById('main');
+  document.getElementById('placeholder')?.remove();
+
+  const loadingEl = document.createElement('div');
+  loadingEl.className = 'loading';
+  loadingEl.innerHTML = '<div class="spinner"></div> Criando seu conteúdo...';
+  main.prepend(loadingEl);
+
+  const systemPrompt = `Você é um especialista em copywriting persuasivo para Instagram. Domina ganchos de storytelling, quebra de padrão, promessa, curiosidade, autoridade e bastidores.
+
+Frameworks comprovados:
+- Storytelling: "O momento que percebi que [X]", "O dia que [X]"
+- Quebra de padrão: "Você está fazendo isso errado", "Ninguém está falando sobre isso"
+- Promessa: "Como [resultado] em [tempo]", "O método simples para..."
+- Curiosidade & Dor: "Olha o que aconteceu quando...", "O motivo de você não crescer é esse"
+- Autoridade: "Depois de atender X clientes...", "Eu analisei 100 perfis e descobri..."
+- Bastidores: "O que ninguém vê por trás de [X]", "O que aconteceu nos bastidores de [X]"
+- Arrependimento: "Se eu pudesse voltar no tempo, faria isso"
+
+Retorne APENAS JSON válido, sem markdown, sem backticks, sem explicações.`;
+
+  const formatInstructions = {
+    reels: `{ "hook_visual": "...", "hook_fala": "...", "desenvolvimento": "...", "virada": "...", "cta": "...", "legenda": "..." }`,
+    carrossel: `{ "capa": { "titulo": "...", "subtitulo": "..." }, "slides": [{ "numero": 1, "titulo": "...", "texto": "..." }], "ultimo_slide": { "titulo": "...", "texto": "..." }, "legenda": "..." }`,
+    single: `{ "titulo_card": "...", "subtexto": "...", "legenda": "..." }`,
+    legenda: `{ "hook": "...", "desenvolvimento": "...", "cta": "...", "hashtags": "..." }`,
+  };
+
+  const userPrompt = `Nicho: ${niche || 'não especificado'}
+Formato: ${formatLabels[selectedFormat]}
+Gancho: ${hookLabels[selectedHook]}
+Objetivo: ${objLabels[selectedObj]}
+Briefing: ${brief}
+
+Retorne JSON neste formato exato:
+${formatInstructions[selectedFormat]}`;
+
+  try {
+    const response = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ system: systemPrompt, user: userPrompt }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.error || 'Erro na API');
+
+    const raw = data.content?.map(i => i.text || '').join('');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    loadingEl.remove();
+    renderOutput(parsed);
+
+  } catch (err) {
+    loadingEl.remove();
+    const errEl = document.createElement('div');
+    errEl.className = 'error-msg';
+    errEl.textContent = 'Erro ao gerar conteúdo: ' + err.message;
+    main.prepend(errEl);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✦ Gerar Conteúdo';
+}
+
+function renderOutput(data) {
+  const main = document.getElementById('main');
+  const card = document.createElement('div');
+  card.className = 'output-card';
+
+  const rawStr = JSON.stringify(data).replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
+
+  card.innerHTML = `
+    <div class="output-header">
+      <div class="output-title">${formatLabels[selectedFormat]} · ${hookLabels[selectedHook]}</div>
+      <div class="output-meta">
+        <span class="tag">${objLabels[selectedObj]}</span>
+        <button class="copy-btn" id="copyBtn_${Date.now()}">Copiar tudo</button>
+      </div>
+    </div>
+    <div class="content-body" id="body_${Date.now()}"></div>
+  `;
+
+  const body = card.querySelector('.content-body');
+  const copyBtn = card.querySelector('.copy-btn');
+
+  copyBtn.addEventListener('click', () => {
+    const text = Object.entries(data).map(([k, v]) => {
+      if (Array.isArray(v)) return k.toUpperCase() + ':\n' + v.map(s => `${s.numero||''} ${s.titulo||''}\n${s.texto||''}`).join('\n');
+      if (typeof v === 'object' && v !== null) return k.toUpperCase() + ':\n' + Object.values(v).join(' — ');
+      return k.toUpperCase() + ':\n' + v;
+    }).join('\n\n');
+    navigator.clipboard.writeText(text).then(() => {
+      copyBtn.textContent = '✓ Copiado!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => { copyBtn.textContent = 'Copiar tudo'; copyBtn.classList.remove('copied'); }, 2000);
+    });
+  });
+
+  if (selectedFormat === 'reels') {
+    body.innerHTML = `
+      <div class="roteiro-section"><div class="roteiro-label">🎯 Gancho Visual (0–3s)</div><div class="roteiro-text hook">${esc(data.hook_visual)}</div></div>
+      <div class="roteiro-section"><div class="roteiro-label">🎤 Gancho Falado (0–3s)</div><div class="roteiro-text hook">${esc(data.hook_fala)}</div></div>
+      <div class="roteiro-section"><div class="roteiro-label">📖 Desenvolvimento</div><div class="roteiro-text">${esc(data.desenvolvimento)}</div></div>
+      <div class="roteiro-section"><div class="roteiro-label">⚡ Virada / Insight</div><div class="roteiro-text">${esc(data.virada)}</div></div>
+      <div class="roteiro-section"><div class="roteiro-label">✅ CTA Final</div><div class="roteiro-text cta">${esc(data.cta)}</div></div>
+      <div class="roteiro-section"><div class="roteiro-label">✍️ Legenda</div><div class="roteiro-text">${esc(data.legenda)}</div></div>
+    `;
+  } else if (selectedFormat === 'carrossel') {
+    const slides = (data.slides||[]).map(s => `
+      <div class="slide-item">
+        <div class="slide-num">${s.numero}</div>
+        <div class="slide-content">
+          <div class="slide-title">${esc(s.titulo)}</div>
+          <div class="slide-body">${esc(s.texto)}</div>
+        </div>
+      </div>`).join('');
+    body.innerHTML = `
+      <div class="roteiro-section"><div class="roteiro-label">🖼️ Capa</div><div class="roteiro-text hook">${esc(data.capa?.titulo)}${data.capa?.subtitulo ? '<br><small>'+esc(data.capa.subtitulo)+'</small>' : ''}</div></div>
+      <div class="roteiro-section"><div class="roteiro-label">📋 Slides</div><div class="slides-preview">${slides}</div></div>
+      <div class="roteiro-section"><div class="roteiro-label">✅ Último Slide (CTA)</div><div class="roteiro-text cta">${esc(data.ultimo_slide?.titulo)}<br>${esc(data.ultimo_slide?.texto)}</div></div>
+      <div class="roteiro-section"><div class="roteiro-label">✍️ Legenda</div><div class="roteiro-text">${esc(data.legenda)}</div></div>
+    `;
+  } else if (selectedFormat === 'single') {
+    body.innerHTML = `
+      <div class="roteiro-section"><div class="roteiro-label">🖼️ Texto do Card</div><div class="roteiro-text hook">${esc(data.titulo_card)}</div></div>
+      ${data.subtexto ? `<div class="roteiro-section"><div class="roteiro-label">📝 Subtexto</div><div class="roteiro-text">${esc(data.subtexto)}</div></div>` : ''}
+      <div class="roteiro-section"><div class="roteiro-label">✍️ Legenda</div><div class="roteiro-text">${esc(data.legenda)}</div></div>
+    `;
+  } else if (selectedFormat === 'legenda') {
+    body.innerHTML = `
+      <div class="roteiro-section"><div class="roteiro-label">🪝 Hook (primeira linha)</div><div class="roteiro-text hook">${esc(data.hook)}</div></div>
+      <div class="roteiro-section"><div class="roteiro-label">📖 Desenvolvimento</div><div class="roteiro-text">${esc(data.desenvolvimento)}</div></div>
+      <div class="roteiro-section"><div class="roteiro-label">✅ CTA</div><div class="roteiro-text cta">${esc(data.cta)}</div></div>
+      <div class="roteiro-section"><div class="roteiro-label"># Hashtags</div><div class="roteiro-text">${esc(data.hashtags)}</div></div>
+    `;
+  }
+
+  main.prepend(card);
+}
+
+function esc(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+document.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'Enter') generate(); });
+</script>
+</body>
+</html>
